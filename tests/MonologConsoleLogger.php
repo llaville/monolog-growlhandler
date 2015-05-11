@@ -71,8 +71,8 @@ class MonologConsoleLogger extends Logger
 
         try {
             $options = array(
-                'resourceDir' => __DIR__,
-                'defaultIcon' => 'growl_phpunit.png',
+                'resourceDir' => dirname(__DIR__) . '/vendor/pear-pear.php.net/Net_Growl/data/Net_Growl/data',
+                'defaultIcon' => '80/growl_phpunit.png',
             );
 
             $growl = new GrowlHandler(
