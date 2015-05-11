@@ -18,8 +18,6 @@ use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Formatter\LineFormatter;
 
-require_once 'Net/Growl/Autoload.php';
-
 /**
  * Monolog handler that send notifications to Growl.
  *

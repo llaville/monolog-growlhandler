@@ -9,9 +9,16 @@
         "source": "https://github.com/llaville/monolog-growlhandler",
         "issues": "https://github.com/llaville/monolog-growlhandler/issues"
     },
+    "repositories": [
+        {
+            "type": "pear",
+            "url": "https://pear.php.net"
+        }
+    ],
     "require": {
         "php": ">=5.3.0",
-        "monolog/monolog": "~1.10"
+        "monolog/monolog": "~1.10",
+        "pear-pear.php.net/Net_Growl": "~2.7"
     },
     "require-dev": {
         "bartlett/monolog-callbackfilterhandler": "~1.0",
