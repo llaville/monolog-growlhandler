@@ -77,7 +77,7 @@ try {
         ),
     );
     $options = array(
-        'AppIcon' => $resourceDir . 'growl-starkicon.png',
+        'AppIcon' => dirname(__DIR__) . '/vendor/pear-pear.php.net/Net_Growl/data/Net_Growl/data/128/growl-starkicon.png',
         // if you have troubles with Net_Growl then debug requests to a local file
         //'debug'   => __DIR__ . '/net_growl_debug.log',
     );
