@@ -1,0 +1,55 @@
+= Developer Guide
+:description: All you have to know about architecture.
+include::revision.asciidoc[]
+include::attributes.asciidoc[]
+
+ifdef::basebackend-docbook[]
+[partintro]
+--
+image:icons/font-awesome/puzzle-piece.png[alt="Configurations",icon="puzzle-piece",iconsfont="font-awesome",size="9x"]
+*Configuration*
+
+See xref:_configuration[]
+
+image:icons/font-awesome/code.png[alt="Filters",icon="code",iconsfont="font-awesome",size="9x"]
+*Filters*
+
+See xref:_filters[]
+--
+endif::basebackend-docbook[]
+
+ifdef::basebackend-html[]
+====
+[panel,info,code,font-awesome]
+.Configuration
+--
+[label label-primary]#GrowlHandler# use the PEAR Net_Growl package to send notification to Growl using GNTP protocol.
+
+To match your needs and feeling, you've ability to configure each properties of Net_Growl 
+(Application's name registered, Icons notification, and lot more ...)
+
+ifdef::basebackend-bootstrap[]
+link:developer-guide&#45;&#45;configuration.html["Configuration",role="primary",icon="glyphicon-book",options="block"]
+endif::basebackend-bootstrap[]
+ifndef::basebackend-bootstrap[]
+link:developer-guide&#45;&#45;configuration.html[Configuration]
+endif::basebackend-bootstrap[]
+--
+====
+
+====
+[panel,info,search-plus,font-awesome]
+.Filters
+--
+Even if it's enough to other monolog handlers, the *LogLevel* strategy is not enough to limit notification
+of important messages for [label label-primary]#GrowlHandler#. We will see how to bypass this restriction.
+
+ifdef::basebackend-bootstrap[]
+link:developer-guide&#45;&#45;filters.html["Filters",role="primary",icon="glyphicon-book",options="block"]
+endif::basebackend-bootstrap[]
+ifndef::basebackend-bootstrap[]
+link:developer-guide&#45;&#45;filters.html[Filters]
+endif::basebackend-bootstrap[]
+--
+====
+endif::basebackend-html[]

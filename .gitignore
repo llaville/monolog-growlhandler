@@ -1,0 +1,6 @@
+Thumbs.db
+*.tgz
+*.zip
+*.log
+vendor/
+phpunit.xml

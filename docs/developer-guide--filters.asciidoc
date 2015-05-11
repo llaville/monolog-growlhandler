@@ -1,0 +1,152 @@
+= Filters
+:description: How to limit notifications to certain log records.
+include::revision.asciidoc[]
+include::attributes.asciidoc[]
+
+== LogLevel Strategy
+
+Monolog uses only the eight http://tools.ietf.org/html/rfc5424[RFC 5424] levels
+(debug, info, notice, warning, error, critical, alert, emergency) for basic filtering
+purposes.
+
+If it's enough to limit log records received by each handler, we need more flexibility
+with [label label-primary]#GrowlHandler# to avoid to be spammed with ton of log records.
+
+We have a start of solution with the `FilterHandler` available in Monolog since version 1.8.0,
+that filter log records on one or more levels.
+But this is not without counted the new `CallbackFilterHandler` that raised this limitation,
+and allow advanced filtering behaviours (you can filter on each log record property).
+
+== Advanced filtering Strategy
+
+Suppose you want to be notified at end of a long process with a specific message or contextual data,
+`CallbackFilterHandler` is what you're waiting for.
+
+It can be combined as a wrapper with any other monolog handlers, and not just the [label label-primary]#GrowlHandler#.
+
+Here we will only demonstrate its capabilities in one example. We simulate a file queue processing that log all filenames
+and a message when it's over.
+
+[source, php]
+----
+<?php
+require_once 'vendor/autoload.php';
+
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Processor\PsrLogMessageProcessor;
+
+$processors = array(
+    new PsrLogMessageProcessor(),
+);
+
+// Create the logger
+$logger = new Logger('long_process', array(), $processors);
+
+// Create some handlers
+$stream = new RotatingFileHandler(__DIR__ . DIRECTORY_SEPARATOR . 'long_process.log');
+$stream->setFilenameFormat('{filename}-{date}', 'Ymd');
+
+$logger->pushHandler($stream);
+
+// Processing each file in a queue
+$queue = new \SplQueue();
+for ($i = 1; $i < 10; $i++) {
+    $queue->enqueue( sprintf('File_%02d.txt', $i) );
+}
+$fileCount = count($queue);
+
+while (!$queue->isEmpty()) {
+    $file = $queue->dequeue();
+
+    $logger->addInfo('Processing file "{filename}"', array('filename' => $file));
+    echo '.';
+
+    // simulate the long process
+    sleep(1);
+}
+
+$logger->addInfo(
+    'Long Process with {count} files, is over !',
+    array('count' => $fileCount)
+);
+----
+
+At this step, if we just push an instance of [label label-primary]#GrowlHandler# to the logger stack, as following
+
+[source, php]
+----
+<?php
+use Bartlett\Monolog\Handler\GrowlHandler;
+
+try {
+    $growl = new GrowlHandler(
+        array(), // with all default options
+        Logger::INFO
+    );
+
+    $logger->pushHandler($growl);
+
+} catch (\Exception $e) {
+    // Growl server is probably not started
+    echo $e->getMessage(), PHP_EOL;
+}
+----
+
+We will receive all log INFO record notifications to our Growl client.
+
+The solution is to use the `CallbackFilterHandler` to send only one notification (the end message only).
+
+Suppose we want to be notified only if at least 5 files were proceeded.
+[source, php]
+.Filter rules
+----
+<?php
+
+    $filters = array(
+        function ($record) {
+            if (!array_key_exists('count', $record['context'])) {
+                return false;
+            }
+            return ($record['context']['count'] > 5);
+        }
+    );
+----
+
+And in script, we will replaced the previous `$growl` instance with this one :
+[source, php]
+----
+<?php
+use Bartlett\Monolog\Handler\CallbackFilterHandler;
+
+    $growl = new CallbackFilterHandler(
+        new GrowlHandler(
+            array(), // with all default options
+            Logger::INFO
+        ),
+        $filters
+    );
+----
+
+NOTE: Filter rules limitation is only your imagination !
+
+
+== Next
+
+************************************************
+.Read more
+
+* `CallbackFilterHandler` is not part of standard Monolog distribution, but is available
+on Packagist http://packagist.org/packages/bartlett/monolog-callbackfilterhandler[bartlett/monolog-callbackfilterhandler]
+and as such installable via Composer.
+http://php5.laurent-laville.org/callbackfilterhandler/[Learn more].
+
+* Learn how to configure your Growl Application.
+ifdef::basebackend-docbook[]
+See xref:_configuration[]
+endif::basebackend-docbook[]
+ifdef::basebackend-html[]
+link:developer-guide&#45;&#45;configuration.html[Read now]
+endif::basebackend-html[]
+
+************************************************

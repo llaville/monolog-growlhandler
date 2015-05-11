@@ -1,0 +1,4 @@
+:revdate:           2015-05-11
+:revnumber:         1.0.0
+:stable:            1.0.0
+:stablePubDate:     May 11, 2015

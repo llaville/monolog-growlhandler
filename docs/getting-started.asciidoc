@@ -1,0 +1,124 @@
+= Getting Started
+:description: Startup in 5 minutes
+include::revision.asciidoc[]
+include::attributes.asciidoc[]
+
+
+== Install via Composer
+
+This handler what is not part of standard Monolog distribution, is available
+on Packagist http://packagist.org/packages/bartlett/monolog-growlhandler[bartlett/monolog-growlhandler]
+and as such installable via http://getcomposer.org/[Composer].
+
+[source,bash]
+----
+$ php composer.phar require bartlett/monolog-growlhandler
+----
+
+
+== First notifications
+
+[role="lead"]
+With this first example, we want to be notified with Growl as soon as a critical condition occurs.
+
+Using [label label-primary]#GrowlHandler#, is no more no less simple, than with other monolog handlers.
+
+[label label-primary]#GrowlHandler# class constructor requires :
+
+* a growl configuration (`array`) or instance (`Net_Growl`) as first argument,
+* the minimum logging level at which this handler will be triggered as second argument,
+* and whether the messages that are handled can bubble up the stack or not as third argument.
+
+So to receive only CRITICAL events or higher, you have just to set the logging level to `Logger::CRITICAL`.
+
+[source, php]
+----
+<?php
+
+try {
+    $growl = new GrowlHandler(
+        array(), // with all default options
+        Logger::CRITICAL
+    );
+
+} catch (\Exception $e) {
+    // Growl server is probably not started
+    echo $e->getMessage(), PHP_EOL;
+}
+----
+TIP: DO NOT forget to try-catch instance creation, because it will attempt to connect to server,
+and raise a `Net_Growl_Exception` if its impossible.
+
+Of course it may be combined with any other monolog handler. Here is now the full script:
+
+[source, php]
+----
+<?php
+require_once 'vendor/autoload.php';
+
+use Bartlett\Monolog\Handler\GrowlHandler;
+
+use Monolog\Logger;
+
+// Create the logger
+$logger = new Logger('my_logger');
+
+// Create some handlers
+try {
+    $growl = new GrowlHandler(
+        array(), // with all default options
+        Logger::CRITICAL
+    );
+
+    $logger->pushHandler($growl);
+
+} catch (\Exception $e) {
+    // Growl server is probably not started
+    echo $e->getMessage(), PHP_EOL;
+}
+
+// You can now use your logger
+$logger->addInfo('My logger is now ready');
+
+$logger->addError('An error has occured.');
+
+try {
+    throw new \RuntimeException();
+
+} catch (\Exception $e) {
+    $logger->addCritical(
+        'A critical condition has occured. You will be notified by growl.',
+        array('exception' => $e)
+    );
+}
+----
+
+
+== Summary
+
+[role="lead"]
+Let's review what we've done :
+
+* installed the latest stable version using Composer.
+* built your first notifications condition.
+
+
+== Next
+
+[role="lead"]
+Choose your way depending of your skill level.
+
+************************************************
+.Read more
+
+* Want to learn how to configure your Net_Growl instance,
+or limit notifications to certain log records,
+have a look on
+ifdef::basebackend-html[]
+link:developer-guide.html[developer's guide]
+endif::basebackend-html[]
+ifdef::basebackend-docbook[]
+xref:_developer_guide[]
+endif::basebackend-docbook[]
+
+************************************************

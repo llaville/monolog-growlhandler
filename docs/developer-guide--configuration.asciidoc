@@ -1,0 +1,221 @@
+= Configuration
+:description: How to change Growl notifications behavior.
+include::revision.asciidoc[]
+include::attributes.asciidoc[]
+
+== Some options
+
+There are too many options to configure your Growl Application, and we will not
+see it all, but just few of them.
+
+In following example, our goal is to see how to change easily, look and feel of your application,
+displayed by your Growl client.
+
+We will :
+
+* change default icon of application from `growl.png` to `growl-starkicon.png`
+footnote:[http://www.iconarchive.com/show/stark-icons-by-fruityth1ng/Growl-icon.html]
+* change default icon of each notification channel (log level for Monolog),
+** `green.png`, for debug, info
+** `yellow.png`, for notice, warning
+** `red.png`, for error, critical, alert, emergency
+* change the default line formatter to include the level name about message displayed
+
+We will also filter messages, with help of `CallbackFilterHandler` footnote:[http://php5.laurent-laville.org/callbackfilterhandler/]
+
+* allow notification of log records less than warning
+* allow notification of message starting with, _An error has occured_, only if contextual data `exception` is present.
+
+[source, php]
+.Filter rules
+----
+<?php
+$filters = array(
+    function ($record) {
+        if ($record['level'] < Logger::WARNING) {
+            return true;
+        }
+        if (!array_key_exists('exception', $record['context'])) {
+            return false;
+        }
+        return (preg_match('/^An error has occured/', $record['message']) === 1);
+    }
+);
+----
+
+To change notification's icons, we have to :
+
+* specify the resource folder `$resourceDir`, where to find images
+* specify for each notification channel, what new icon will replaced the default one
++
+[source, php]
+----
+<?php
+
+use Bartlett\Monolog\Handler\GrowlHandler;
+
+    $resourceDir   = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+    $notifications = array(
+        GrowlHandler::DEBUG => array(
+            'icon'    => $resourceDir . 'green.png',
+        ),
+        GrowlHandler::INFO => array(
+            'icon'    => $resourceDir . 'green.png',
+        ),
+        GrowlHandler::NOTICE => array(
+            'icon'    => $resourceDir . 'yellow.png',
+        ),
+        GrowlHandler::WARNING => array(
+            'icon'    => $resourceDir . 'yellow.png',
+        ),
+        GrowlHandler::ERROR => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+        GrowlHandler::CRITICAL => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+        GrowlHandler::ALERT => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+        GrowlHandler::EMERGENCY => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+    );
+----
+
+To change application icon, that identified it in your Growl client :
+
+[source, php]
+----
+<?php
+
+    $options = array(
+        'AppIcon' => $resourceDir . 'growl-starkicon.png',
+    );
+----
+
+Have a look on the PEAR http://growl/laurent-laville.org[Net_Growl documentation],
+to learn more about all features, and options.
+
+Now your full script should be like this one :
+
+[source, php]
+----
+<?php
+require_once 'vendor/autoload.php';
+
+use Bartlett\Monolog\Handler\GrowlHandler;
+use Bartlett\Monolog\Handler\CallbackFilterHandler;
+
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Formatter\LineFormatter;
+
+// Create the logger
+$logger = new Logger('growl_conf');
+
+// Create filter rules
+$filters = array(
+    function ($record) {
+        if ($record['level'] < Logger::WARNING) {
+            return true;
+        }
+        if (!array_key_exists('exception', $record['context'])) {
+            return false;
+        }
+        return (preg_match('/^An error has occured/', $record['message']) === 1);
+    }
+);
+
+// Create some handlers
+$stream = new RotatingFileHandler(__DIR__ . DIRECTORY_SEPARATOR . 'growl_conf.log');
+$stream->setFilenameFormat('{filename}-{date}', 'Ymd');
+
+$logger->pushHandler($stream);
+
+try {
+    $resourceDir   = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+    $notifications = array(
+        GrowlHandler::DEBUG => array(
+            'icon'    => $resourceDir . 'green.png',
+        ),
+        GrowlHandler::INFO => array(
+            'icon'    => $resourceDir . 'green.png',
+        ),
+        GrowlHandler::NOTICE => array(
+            'icon'    => $resourceDir . 'yellow.png',
+        ),
+        GrowlHandler::WARNING => array(
+            'icon'    => $resourceDir . 'yellow.png',
+        ),
+        GrowlHandler::ERROR => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+        GrowlHandler::CRITICAL => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+        GrowlHandler::ALERT => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+        GrowlHandler::EMERGENCY => array(
+            'icon'    => $resourceDir . 'red.png',
+        ),
+    );
+    $options = array(
+        'AppIcon' => $resourceDir . 'growl-starkicon.png',
+        // if you have troubles with Net_Growl then debug requests to a local file
+        //'debug'   => __DIR__ . '/net_growl_debug.log',
+    );
+
+    $growl = new GrowlHandler(
+        array(
+            'name'          => 'My Custom Growl',
+            'notifications' => $notifications,
+            'options'       => $options,
+        )
+    );
+    $growl->setFormatter(
+        new LineFormatter("%message%\n%level_name%")
+    );
+
+    $logger->pushHandler(new CallbackFilterHandler($growl, $filters));
+
+} catch (\Exception $e) {
+    // Growl server is probably not started
+    echo $e->getMessage(), PHP_EOL, PHP_EOL;
+}
+
+// You can now use your logger
+$logger->addInfo('My logger is now ready');
+
+// This record won't be stopped by the $filters rules, but by the growl $notifications config
+$logger->addDebug('A debug message.');
+
+$logger->addError('An error has occured. Will be logged to file BUT NOT notified by Growl.');
+
+try {
+    throw new \RuntimeException();
+
+} catch (\Exception $e) {
+    $logger->addCritical(
+        'An error has occured. Will be logged to file AND notified by Growl.',
+        array('exception' => $e)
+    );
+}
+----
+
+
+== Next
+
+************************************************
+.Read more
+
+* Learn more about filter feature.
+ifdef::basebackend-docbook[]
+See xref:_fitlers[]
+endif::basebackend-docbook[]
+ifdef::basebackend-html[]
+link:developer-guide&#45;&#45;filters.html[Read now]
+endif::basebackend-html[]
+
+************************************************

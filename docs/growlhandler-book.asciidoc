@@ -1,0 +1,20 @@
+= GrowlHandler Book
+:description: The Complete Guide
+include::revision.asciidoc[]
+include::attributes.asciidoc[]
+
+[preface]
+--
+This complete guide documents {brand} {revnumber}, published on {revdate}.
+
+This work is licensed under the http://creativecommons.org/licenses/by-sa/3.0/[Attribution-Share Alike 3.0 Unported] license.
+--
+
+include::getting-started.asciidoc[]
+
+include::developer-guide.asciidoc[]
+:leveloffset: 1
+include::developer-guide--configuration.asciidoc[]
+
+include::developer-guide--filters.asciidoc[]
+:leveloffset: 0
