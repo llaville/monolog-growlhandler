@@ -212,7 +212,7 @@ try {
 
 * Learn more about filter feature.
 ifdef::basebackend-docbook[]
-See xref:_fitlers[]
+See xref:_filters[]
 endif::basebackend-docbook[]
 ifdef::basebackend-html[]
 link:developer-guide&#45;&#45;filters.html[Read now]
