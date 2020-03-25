@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "monolog/monolog",
-            "version": "1.13.1",
+            "version": "1.25.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "c31a2c4e8db5da8b46c74cf275d7f109c0f249ac"
+                "reference": "fa82921994db851a8becaf3787a9e73c5976b6f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c31a2c4e8db5da8b46c74cf275d7f109c0f249ac",
-                "reference": "c31a2c4e8db5da8b46c74cf275d7f109c0f249ac",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/fa82921994db851a8becaf3787a9e73c5976b6f1",
+                "reference": "fa82921994db851a8becaf3787a9e73c5976b6f1",
                 "shasum": ""
             },
             "require": {
@@ -28,14 +28,17 @@
                 "psr/log-implementation": "1.0.0"
             },
             "require-dev": {
-                "aws/aws-sdk-php": "~2.4, >2.4.8",
+                "aws/aws-sdk-php": "^2.4.9 || ^3.0",
                 "doctrine/couchdb": "~1.0@dev",
                 "graylog2/gelf-php": "~1.0",
-                "phpunit/phpunit": "~4.0",
-                "raven/raven": "~0.5",
-                "ruflin/elastica": "0.90.*",
-                "swiftmailer/swiftmailer": "~5.3",
-                "videlalvaro/php-amqplib": "~2.4"
+                "jakub-onderka/php-parallel-lint": "0.9",
+                "php-amqplib/php-amqplib": "~2.4",
+                "php-console/php-console": "^3.1.3",
+                "phpunit/phpunit": "~4.5",
+                "phpunit/phpunit-mock-objects": "2.3.0",
+                "ruflin/elastica": ">=0.90 <3.0",
+                "sentry/sentry": "^0.13",
+                "swiftmailer/swiftmailer": "^5.3|^6.0"
             },
             "suggest": {
                 "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
@@ -43,15 +46,17 @@
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
                 "ext-mongo": "Allow sending log messages to a MongoDB server",
                 "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
-                "raven/raven": "Allow sending log messages to a Sentry server",
+                "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
+                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
+                "php-console/php-console": "Allow sending log messages to Google Chrome",
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
                 "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
-                "videlalvaro/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib"
+                "sentry/sentry": "Allow sending log messages to a Sentry server"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.13.x-dev"
+                    "dev-master": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -77,7 +82,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2015-03-09T09:58:04+00:00"
+            "time": "2019-12-20T14:15:16+00:00"
         },
         {
             "name": "pear/net_growl",
@@ -284,33 +289,35 @@
         },
         {
             "name": "bartlett/phpunit-loggertestlistener",
-            "version": "1.5.0",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/llaville/phpunit-LoggerTestListener.git",
-                "reference": "7ad1d57a5f51490d09e2395d15d791c469353264"
+                "reference": "fb5ae201e67e379b490c205be662f6470b352c0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/llaville/phpunit-LoggerTestListener/zipball/7ad1d57a5f51490d09e2395d15d791c469353264",
-                "reference": "7ad1d57a5f51490d09e2395d15d791c469353264",
+                "url": "https://api.github.com/repos/llaville/phpunit-LoggerTestListener/zipball/fb5ae201e67e379b490c205be662f6470b352c0e",
+                "reference": "fb5ae201e67e379b490c205be662f6470b352c0e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0",
-                "psr/log": "~1.0"
+                "php": "^5.4||^7.0",
+                "psr/log": "^1.0"
             },
             "require-dev": {
-                "bartlett/monolog-callbackfilterhandler": "~1.0",
-                "monolog/monolog": "~1.10"
+                "bartlett/monolog-callbackfilterhandler": "^1.0",
+                "bartlett/monolog-growlhandler": "^1.0",
+                "monolog/monolog": "^1.10"
             },
             "suggest": {
                 "bartlett/monolog-callbackfilterhandler": "Advanced filtering strategies for Monolog",
+                "bartlett/monolog-growlhandler": "Sends notifications to Growl for Monolog",
                 "monolog/monolog": "For advanced logging strategies"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Bartlett\\": "src/"
                 }
             },
@@ -328,37 +335,7 @@
             ],
             "description": "PHPUnit Test Suite listener for compatible PSR-3 logger",
             "homepage": "https://github.com/llaville/phpunit-LoggerTestListener",
-            "time": "2015-05-04T11:26:44+00:00"
-        },
-        {
-            "name": "pear-pear.php.net/Net_Growl",
-            "version": "2.7.0",
-            "dist": {
-                "type": "file",
-                "url": "https://pear.php.net/get/Net_Growl-2.7.0.tgz"
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "ext-pcre": "*",
-                "ext-spl": "*",
-                "php": ">=5.2.0.0"
-            },
-            "replace": {
-                "pear-pear/net_growl": "== 2.7.0.0"
-            },
-            "type": "pear-library",
-            "autoload": {
-                "classmap": [
-                    ""
-                ]
-            },
-            "include-path": [
-                "/"
-            ],
-            "license": [
-                "BSD License"
-            ],
-            "description": "Growl is a MACOSX application that listen to notifications sent by\napplications and displays them on the desktop using different display\nstyles. Net_Growl offers the possibility to send notifications to Growl\nfrom your PHP application through network communication using UDP."
+            "time": "2018-10-01T19:53:31+00:00"
         }
     ],
     "aliases": [],
